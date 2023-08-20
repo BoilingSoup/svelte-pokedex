@@ -11,26 +11,33 @@
     queryKey: [pokeID],
     queryFn: () => fetchPoke(pokeID),
     enabled: started,
+    cacheTime: Infinity,
+    staleTime: Infinity,
   });
 
-  onMount(() => {
-    const handleSpacebar = (e: KeyboardEvent) => {
-      if (e.key !== " ") {
-        return;
-      }
-      started = true;
-      pokeID = Math.floor(Math.random() * 700 + 1);
-    };
+  const handleSpacebar = (e: KeyboardEvent) => {
+    if (e.key !== " ") {
+      return;
+    }
 
+    updateStates();
+  };
+
+  onMount(() => {
     window.addEventListener("keydown", handleSpacebar);
     return () => window.removeEventListener("keydown", handleSpacebar);
   });
+
+  function updateStates() {
+    started = true;
+    pokeID = Math.floor(Math.random() * 700 + 1);
+  }
 </script>
 
-<main class={mainCss}>
+<main class={mainCss} on:click={() => updateStates()}>
   <section class={screenCss}>
     {#if !started}
-      press SPACE to fetch a random pokemon
+      press SPACE or click anywhere to fetch a random pokemon
     {:else if $query.isLoading}
       <p>Loading...</p>
     {:else if $query.isError}
